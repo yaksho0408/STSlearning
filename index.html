@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ask & Learn</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    input,
+    button {
+      padding: 10px;
+      margin: 10px 0;
+      width: 100%;
+      max-width: 400px;
+    }
+    .result {
+      margin-top: 20px;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Ask & Learn</h1>
+  <p>Enter your question and get an answer with images, examples, and summaries.</p>
+
+  <!-- User input form -->
+  <input type="text" id="userQuestion" placeholder="Ask a question here..." />
+  <button onclick="getAnswer()">Get Answer</button>
+
+  <!-- Displaying Result -->
+  <div class="result" id="result"></div>
+
+  <script>
+    async function getAnswer() {
+      const question = document.getElementById("userQuestion").value;
+
+      if (!question) {
+        alert("Please enter a question.");
+        return;
+      }
+
+      // Call an API (DuckDuckGo Instant Answer)
+      // format=json returns JSON data
+      const response = await fetch(
+        `https://api.duckduckgo.com/?q=${encodeURIComponent(question)}&format=json`
+      );
+      const data = await response.json();
+
+      // If there's at least one relevant topic
+      if (data.RelatedTopics && data.RelatedTopics.length > 0) {
+        const result = data.RelatedTopics[0];
+
+        // Display the result
+        document.getElementById("result").innerHTML = `
+          <h3>Answer Summary:</h3>
+          <p>${result.Text}</p>
+          ${
+            result.Icon && result.Icon.URL
+              ? `<img src="${result.Icon.URL}" alt="Image" />`
+              : ""
+          }
+          <h4>Funny Example:</h4>
+          <p>Imagine if your question was a superhero, it would be <b>${question} Man!</b> 
+          Always saving the day with answers!</p>
+        `;
+      } else {
+        document.getElementById("result").innerHTML = `
+          <p>No relevant information found. Try again with a different question!</p>
+        `;
+      }
+    }
+  </script>
+</body>
+</html>
